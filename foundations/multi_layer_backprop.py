@@ -21,19 +21,18 @@ class Solution:
         #   'dW2':   2D list (gradient w.r.t. W2, rounded to 4 decimals)
         #   'db2':   1D list (gradient w.r.t. b2, rounded to 4 decimals)
         x = np.atleast_2d(np.array(x))
-        W1, b1 = np.array(W1), np.array(b1)
-        W2, b2 = np.array(W2), np.array(b2)
         y_true = np.atleast_2d(np.array(y_true))
+        
+        W1, b1 = np.atleast_2d(W1), np.atleast_2d(np.array(b1))
+        W2, b2 = np.atleast_2d(W2), np.atleast_2d(np.array(b2))
 
         z = x @ W1.T + b1
         h = np.maximum(0, z)
         y_pred = h @ W2.T + b2
-
         squared_error = np.square(y_pred - y_true)
         mse = np.mean(squared_error)
 
         N = x.shape[0]
-
         dl_dy = 2 * (y_pred - y_true) / N
         dl_dh = dl_dy @ W2
         relu_mask = (z > 0).astype(float)
