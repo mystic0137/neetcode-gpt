@@ -13,8 +13,9 @@ class Solution:
         # Sigmoid: σ(z) = 1 / (1 + exp(-z))
         # ReLU: max(0, z)
         # return round(your_answer, 5)
-        z = np.dot(x, w) + b
-        if activation.lower() == 'sigmoid':
-            return np.round(1 / (1 + np.exp(-z)), 5)
-        else:
-            return np.round(np.maximum(0, z), 5)
+        pre_activation = np.dot(x, w) + b
+        if activation == "sigmoid":
+            result = 1 / (1 + np.exp(-pre_activation))
+            return np.round(result, 5)
+        result = np.maximum(0, pre_activation)
+        return np.round(result, 5)
