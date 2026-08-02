@@ -22,22 +22,22 @@ class Solution:
         #   'db2':   1D list (gradient w.r.t. b2, rounded to 4 decimals)
         x = np.atleast_2d(np.array(x))
         y_true = np.atleast_2d(np.array(y_true))
-        
-        W1, b1 = np.atleast_2d(W1), np.atleast_2d(np.array(b1))
-        W2, b2 = np.atleast_2d(W2), np.atleast_2d(np.array(b2))
 
+        W1, b1 = np.atleast_2d(np.array(W1)), np.atleast_2d(np.array(b1))
+        W2, b2 = np.atleast_2d(np.array(W2)), np.atleast_2d(np.array(b2))
+        
         z = x @ W1.T + b1
         h = np.maximum(0, z)
         y_pred = h @ W2.T + b2
         squared_error = np.square(y_pred - y_true)
         mse = np.mean(squared_error)
 
-        N = x.shape[0]
+        N = y_true.shape[0]
         dl_dy = 2 * (y_pred - y_true) / N
         dl_dh = dl_dy @ W2
         relu_mask = (z > 0).astype(float)
-        dl_dz = dl_dh * relu_mask
-        
+        dl_dz = relu_mask * dl_dh
+
         dW1 = dl_dz.T @ x
         db1 = np.sum(dl_dz, axis=0)
 
@@ -49,5 +49,5 @@ class Solution:
             'dW1': np.round(dW1, 4),
             'db1': np.round(db1, 4),
             'dW2': np.round(dW2, 4),
-            'db2': np.round(db2, 4)
+            'db2': np.round(db2, 4),
         }
