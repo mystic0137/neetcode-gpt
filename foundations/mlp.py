@@ -15,7 +15,8 @@ class Solution:
         for layer, (W, b) in enumerate(
             zip(weights, biases)
         ):
-            activation = W.T @ activation + b
+            activation = activation @ W + b
+
             if layer < len(weights) - 1:
                 activation = np.maximum(0, activation)
             
