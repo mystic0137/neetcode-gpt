@@ -26,7 +26,5 @@ class Solution:
             x_hat = (x - running_mean) / np.sqrt(running_var + eps)
         
         y = gamma * x_hat + beta
-        running_mean = [round(z, 4) for z in running_mean]
-        running_var = [round(z, 4) for z in running_var]
 
-        return (np.round(y, decimals=4), running_mean, running_var)
+        return (np.round(y, decimals=4), np.round(running_mean, decimals=4), np.round(running_var, decimals=4))
