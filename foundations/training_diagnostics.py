@@ -10,26 +10,24 @@ class Solution:
         # After each nn.Linear, record: mean, std, dead_fraction
         # Run with torch.no_grad(). Round to 4 decimals.
         stats = []
-
         with torch.no_grad():
-
             for module in model.children():
                 x = module(x)
-
                 if isinstance(module, nn.Linear):
+                    
                     mean_val = round(x.mean().item(), 4)
                     std_val = round(x.std().item(), 4)
 
                     if x.dim() >= 2:
-                        dead_frac = round((x <= 0).all(dim=0).float().mean().item(), 4)
+                        dead_fraction = round((x <= 0).all(dim=0).float().mean().item(), 4)
                     else:
-                        dead_frac = round((x <= 0).float().mean().item(), 4)
+                        dead_fraction = round((x <= 0).float().mean().item(), 4)
                     
                     stats.append(
                         {
                             'mean': mean_val,
                             'std': std_val,
-                            'dead_fraction': dead_frac
+                            'dead_fraction': dead_fraction
                         }
                     )
         return stats
@@ -43,7 +41,6 @@ class Solution:
         loss = nn.MSELoss()(output, y)
         loss.backward()
         stats = []
-
         for module in model.children():
             if isinstance(module, nn.Linear):
                 grad = module.weight.grad
@@ -63,20 +60,15 @@ class Solution:
         # Classify network health based on the stats
         # Return: 'dead_neurons', 'exploding_gradients', 'vanishing_gradients', or 'healthy'
         # Check in priority order (see problem description for thresholds)
-        for activation_stat, gradient_stat in zip(activation_stats, gradient_stats):
-            if activation_stat['dead_fraction'] > 0.5:
+        for activation, gradient in zip(activation_stats, gradient_stats):
+            if activation['dead_fraction'] > 0.5:
                 return 'dead_neurons'
-                break
-            elif gradient_stat['norm'] > 1000:
+            elif gradient['norm'] > 1000:
                 return 'exploding_gradients'
-                break
-            elif gradient_stat['norm'] < 1e-5:
+            elif gradient['norm'] < 1e-5:
                 return 'vanishing_gradients'
-                break
-            elif activation_stat['std'] < 0.1:
+            elif activation['std'] < 0.1:
                 return 'vanishing_gradients'
-                break
-            elif activation_stat['std'] > 10.0:
+            elif activation['std'] > 10.0:
                 return 'exploding_gradients'
-                break
         return 'healthy'
