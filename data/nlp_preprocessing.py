@@ -18,12 +18,12 @@ class Solution:
             for i, word in enumerate(sorted(set(words)), start=1)
         }
 
-        padded_token_ids = []
-        for sentence in sentences:
-            temp = []
-            for word in sentence.split():
-                temp.append(token_map[word])
-            padded_token_ids.append(torch.tensor(temp, dtype=float))
+        padded_token_ids = [
+            torch.tensor(
+                [token_map[word] for word in sentence.split()]
+            )
+            for sentence in sentences
+        ]
         
         padded_token_ids = nn.utils.rnn.pad_sequence(
             padded_token_ids,
