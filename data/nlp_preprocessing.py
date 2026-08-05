@@ -9,25 +9,25 @@ class Solution:
         # 2. Encode each sentence by replacing words with their IDs
         # 3. Combine positive + negative into one list of tensors
         # 4. Pad shorter sequences with 0s using nn.utils.rnn.pad_sequence(tensors, batch_first=True)
-        words = []
-        for string in (positive + negative):
-            words.extend(string.split())
-        words = sorted(set(words))
+        sentences = positive + negative
 
-        token_map = {}
-        for i, word in enumerate(words, start=1):
-            token_map[word] = i
+        words = [word for sentence in sentences for word in sentence.split()]
         
-        embeddings = []
-        for string in (positive + negative):
+        token_map = {
+            word: i
+            for i, word in enumerate(sorted(set(words)), start=1)
+        }
+
+        padded_token_ids = []
+        for sentence in sentences:
             temp = []
-            for word in string.split():
+            for word in sentence.split():
                 temp.append(token_map[word])
-            embeddings.append(torch.tensor(temp, dtype=float))
+            padded_token_ids.append(torch.tensor(temp, dtype=float))
         
-        embedding_tensors = nn.utils.rnn.pad_sequence(
-            embeddings,
+        padded_token_ids = nn.utils.rnn.pad_sequence(
+            padded_token_ids,
             batch_first=True,
             padding_value=0
         )
-        return embedding_tensors
+        return padded_token_ids
