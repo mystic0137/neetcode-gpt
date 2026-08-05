@@ -9,12 +9,13 @@ class Solution:
         # Forward pass through model layer by layer
         # After each nn.Linear, record: mean, std, dead_fraction
         # Run with torch.no_grad(). Round to 4 decimals.
-        stats = []
         with torch.no_grad():
+            stats = []
             for module in model.children():
-                x = module(x)
+                x =  module(x)
+                
+
                 if isinstance(module, nn.Linear):
-                    
                     mean_val = round(x.mean().item(), 4)
                     std_val = round(x.std().item(), 4)
 
@@ -22,7 +23,6 @@ class Solution:
                         dead_fraction = round((x <= 0).all(dim=0).float().mean().item(), 4)
                     else:
                         dead_fraction = round((x <= 0).float().mean().item(), 4)
-                    
                     stats.append(
                         {
                             'mean': mean_val,
@@ -30,13 +30,14 @@ class Solution:
                             'dead_fraction': dead_fraction
                         }
                     )
-        return stats
+            return stats
 
     def compute_gradient_stats(self, model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> List[Dict[str, float]]:
         # Forward + backward pass with nn.MSELoss
         # For each nn.Linear layer's weight gradient, record: mean, std, norm
         # Call model.zero_grad() first. Round to 4 decimals.
         model.zero_grad()
+
         output = model(x)
         loss = nn.MSELoss()(output, y)
         loss.backward()
@@ -44,9 +45,11 @@ class Solution:
         for module in model.children():
             if isinstance(module, nn.Linear):
                 grad = module.weight.grad
-                mean_val = round(grad.mean().item(), 4)
-                std_val = round(grad.std().item(), 4)
-                norm_val = round(torch.norm(grad).item(), 4)
+
+                mean_val = round(grad.mean().item(), 5)
+                std_val = round(grad.std().item(), 5)
+                norm_val = round(torch.norm(grad).item(), 5)
+    
                 stats.append(
                     {
                         'mean': mean_val,
@@ -55,6 +58,7 @@ class Solution:
                     }
                 )
         return stats
+
 
     def diagnose(self, activation_stats: List[Dict[str, float]], gradient_stats: List[Dict[str, float]]) -> str:
         # Classify network health based on the stats
